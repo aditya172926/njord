@@ -11,10 +11,11 @@ const API_URL: &str = "https://api.nasa.gov/neo/rest/v1";
 #[tokio::main]
 async fn main() -> Result<(), SqliteError> {
     // Setting up a SQLite DB and Connection
-    let db_relative_path = "./njord_examples/sqlite/neo.db";
+    let db_relative_path = "../sqlite/neo.db";
     let db_path = Path::new(&db_relative_path);
+    println!("db_path {:?}", db_path);
 
-    let neo = get_near_earth_objects(0, 10).await;
+    let neo = get_near_earth_objects(1, 20).await;
     let mut near_earth_objects: Vec<NearEarthObject> = Vec::new();
 
     match neo {
@@ -28,8 +29,14 @@ async fn main() -> Result<(), SqliteError> {
         Err(err) => eprintln!("Error: {}", err),
     }
 
-    let conn = sqlite::open(db_path).unwrap();
-    sqlite::insert(conn, near_earth_objects)?;
+    match sqlite::open(db_path) {
+        Ok(db) => {
+            sqlite::insert(db, near_earth_objects)?;
+        },
+        Err(error) => {
+            println!("Error in connecting to sqlite db {:?}", error);
+        }
+    };
 
     Ok(())
 }
