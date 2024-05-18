@@ -12,7 +12,7 @@ use std::path::Path;
 #[derive(Table)]
 #[table_name = "users"]
 pub struct User {
-    id: usize,
+    id: usize, // TODO: should we create some sort of PrimaryKey<usize> ?
     username: String,
     email: String,
     address: String,
